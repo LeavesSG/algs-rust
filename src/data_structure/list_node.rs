@@ -7,32 +7,39 @@ pub struct ListNode<T> {
 
 impl<T> ListNode<T> {
     pub fn new(val: T) -> Self {
-        {
-            ListNode {
-                value: val,
-                next: None,
-            }
+        ListNode {
+            value: val,
+            next: None,
         }
     }
 
-    pub fn from(mut vec: Vec<T>) -> Option<ListNode<T>> {
-        let mut last = vec.pop();
+    pub fn eat(mut self, node: Self) -> Self {
+        self.next = Some(Box::new(node));
+        return self;
+    }
+
+    pub fn new_from_eat(val: T, node: Self) -> Self {
+        Self::new(val).eat(node)
+    }
+
+    pub fn append_to(val: T, node: Self) -> Self {
+        node.eat(Self::new(val))
+    }
+
+    pub fn from_vec(mut vec: Vec<T>) -> Option<Self> {
+        let mut popped = vec.pop();
         let mut head: Option<ListNode<T>>;
-        match last {
+        match popped {
             Some(l) => {
-                head = Some(ListNode {
-                    value: l,
-                    next: None,
-                });
-                last = vec.pop();
-                while last.is_some() {
+                head = Some(Self::new(l));
+                popped = vec.pop();
+                while popped.is_some() {
                     head = Some(ListNode {
-                        value: last.expect("last is None!"),
+                        value: popped.expect("last is None!"),
                         next: Some(Box::new(head.expect("head is None!"))),
                     });
-                    last = vec.pop();
+                    popped = vec.pop();
                 }
-
                 return head;
             }
             None => return None,
